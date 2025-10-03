@@ -7,6 +7,7 @@ export interface IUser extends Document {
   name: string;
   avatar?: string;
   is_placeholder?: boolean;
+  plan_roles?: Map<string, string>; // plan_id -> role mapping
   created_at: Date;
   updated_at: Date;
 }
@@ -23,7 +24,8 @@ const UserSchema = new Schema<IUser>({
   password_hash: { type: String, required: true },
   name: { type: String, required: true, trim: true },
   avatar: { type: String }, // color/emoji
-  is_placeholder: { type: Boolean, default: false }
+  is_placeholder: { type: Boolean, default: false },
+  plan_roles: { type: Map, of: String, default: new Map() }
 }, { 
   timestamps: { 
     createdAt: "created_at", 

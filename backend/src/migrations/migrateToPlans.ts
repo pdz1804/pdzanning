@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import User from "../models/User";
 import Plan from "../models/Plan";
 import Task from "../models/Task";
@@ -26,7 +26,7 @@ export const migrateToPlans = async () => {
             plan = new Plan({
               name: planName,
               description: `Migrated plan: ${planName}`,
-              owner_id: role === 'owner' ? user._id : new mongoose.Types.ObjectId(), // Temporary owner
+              owner_id: role === 'owner' ? new Types.ObjectId(user._id) : new Types.ObjectId(), // Temporary owner
               members: []
             });
             await plan.save();
@@ -35,14 +35,14 @@ export const migrateToPlans = async () => {
 
           // Add user to plan
           if (role === 'owner') {
-            plan.owner_id = user._id;
+            plan.owner_id = new Types.ObjectId(user._id);
             await plan.save();
           } else {
             // Check if user is already a member
             const existingMember = plan.members.find(m => m.user_id.toString() === user._id.toString());
             if (!existingMember) {
               plan.members.push({
-                user_id: user._id,
+                user_id: new Types.ObjectId(user._id),
                 role: role as "editor" | "viewer",
                 joined_at: new Date()
               });
@@ -61,7 +61,7 @@ export const migrateToPlans = async () => {
       if (typeof task.plan_id === 'string') {
         const plan = await Plan.findOne({ name: task.plan_id });
         if (plan) {
-          task.plan_id = plan._id;
+          task.plan_id = new Types.ObjectId(plan._id);
           await task.save();
           console.log(`Updated task ${task._id} to reference plan ${plan._id}`);
         }

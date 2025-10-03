@@ -1,11 +1,12 @@
 import express from "express";
 import { z } from "zod";
+import { Types } from "mongoose";
 import Task from "../models/Task";
 import User from "../models/User";
 import { authenticateToken } from "../middleware/auth";
 import { requirePlanAccess } from "../middleware/planAccess";
 import { validateRequest } from "../utils/validation";
-import { taskSchema, taskUpdateSchema, bulkTaskSchema, reorderTasksSchema } from "../schemas/task";
+import { taskSchema, taskUpdateSchema, bulkTaskSchema, reorderTasksSchema, TaskInput } from "../schemas/task";
 
 const router = express.Router();
 
@@ -195,7 +196,7 @@ router.patch("/:id", validateRequest(z.object({
 
     // Update task
     Object.assign(task, req.body);
-    task.updated_by = req.user!._id;
+    task.updated_by = new Types.ObjectId(req.user!._id);
     await task.save();
 
     await task.populate([
@@ -248,7 +249,7 @@ router.post("/bulk", validateRequest(z.object({
     for (const taskData of tasks) {
       // Validate parent_id
       if (taskData.parent_id) {
-        const parentExists = tasks.some(t => t._id === taskData.parent_id) || 
+        const parentExists = tasks.some((t: TaskInput) => t._id === taskData.parent_id) || 
           await Task.findOne({ _id: taskData.parent_id, plan_id });
         if (!parentExists) {
           return res.status(400).json({ 
@@ -259,7 +260,7 @@ router.post("/bulk", validateRequest(z.object({
 
       // Validate dependencies
       if (taskData.dependency_ids && taskData.dependency_ids.length > 0) {
-        const validDeps = tasks.filter(t => taskData.dependency_ids!.includes(t._id));
+        const validDeps = tasks.filter((t: TaskInput) => taskData.dependency_ids!.includes(t._id!));
         const existingDeps = await Task.find({ 
           _id: { $in: taskData.dependency_ids }, 
           plan_id 
@@ -274,7 +275,7 @@ router.post("/bulk", validateRequest(z.object({
     }
 
     // Insert tasks
-    const tasksToInsert = tasks.map(taskData => ({
+    const tasksToInsert = tasks.map((taskData: TaskInput) => ({
       ...taskData,
       plan_id,
       created_by: userId,

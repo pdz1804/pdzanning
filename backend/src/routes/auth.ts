@@ -1,6 +1,7 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { Types } from "mongoose";
 import User from "../models/User";
 import Plan from "../models/Plan";
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/jwt";
@@ -43,7 +44,7 @@ router.post("/register", validateRequest(z.object({
     // Make user owner of demo plan if it exists
     const demoPlan = await Plan.findOne({ name: "Demo Plan" });
     if (demoPlan) {
-      demoPlan.owner_id = user._id;
+      demoPlan.owner_id = new Types.ObjectId(user._id);
       await demoPlan.save();
       console.log(`Made ${email} owner of Demo Plan`);
     }

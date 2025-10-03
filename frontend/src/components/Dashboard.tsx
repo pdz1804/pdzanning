@@ -8,16 +8,15 @@ import { KanbanBoard } from '@/components/views/KanbanBoard';
 import { TableView } from '@/components/views/TableView';
 import { GanttView } from '@/components/views/GanttView';
 import { TaskForm } from '@/components/TaskForm';
-import { Plus, Search, FolderPlus, ArrowLeft } from 'lucide-react';
+import { Plus, ArrowLeft, Download } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { apiClient } from '@/lib/api';
 
 export function Dashboard() {
   const { activeView, selectedPlanId, filters, setSelectedPlanId } = useAppStore();
+  const navigate = useNavigate();
   
   const [showTaskForm, setShowTaskForm] = useState(false);
-  const [showCreatePlanForm, setShowCreatePlanForm] = useState(false);
-  const [newPlanName, setNewPlanName] = useState('');
-  const [newPlanDescription, setNewPlanDescription] = useState('');
   const [userPlans, setUserPlans] = useState<Array<{ _id: string; name: string; role: string }>>([]);
   const [isLoadingPlans, setIsLoadingPlans] = useState(false);
 
@@ -47,26 +46,27 @@ export function Dashboard() {
     enabled: !!selectedPlanId // Only fetch tasks when a plan is selected
   });
 
-  const handleCreatePlan = async () => {
-    if (newPlanName.trim()) {
-      try {
-        const newPlan = await apiClient.createPlan(newPlanName.trim(), newPlanDescription.trim() || undefined);
-        
-        // Add to user plans and select it
-        setUserPlans(prev => [...prev, { _id: newPlan._id, name: newPlan.name, role: 'owner' }]);
-        setSelectedPlanId(newPlan._id);
-        
-        // Reset form
-        setNewPlanName('');
-        setNewPlanDescription('');
-        setShowCreatePlanForm(false);
-        
-        console.log('Created plan:', newPlan.name);
-      } catch (error) {
-        console.error('Failed to create plan:', error);
-      }
+  const handleExportPlan = async () => {
+    if (!selectedPlanId) return;
+    
+    try {
+      const exportData = await apiClient.exportPlan(selectedPlanId);
+      
+      // Create and download the file
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `plan-${exportData.plan.name.replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to export plan:', error);
     }
   };
+
 
   const renderActiveView = () => {
     if (isLoading) {
@@ -114,102 +114,27 @@ export function Dashboard() {
     );
   }
 
-  // Show plan selection if no plan selected
+  // Redirect to homepage if no plan selected
   if (!selectedPlanId) {
-      return (
-        <div className="p-4 sm:p-6">
-          <Card className="max-w-2xl mx-auto">
-          <CardHeader>
-            <CardTitle>Select or Create a Plan</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Existing Plans */}
-            {userPlans.length > 0 && (
-              <div>
-                <h3 className="text-lg font-medium mb-4">Your Plans</h3>
-                <div className="grid gap-3">
-                  {userPlans.map((plan) => (
-                    <div
-                      key={plan._id}
-                      onClick={() => setSelectedPlanId(plan._id)}
-                      className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                        selectedPlanId === plan._id 
-                          ? 'border-primary-500 bg-primary-50' 
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-medium">{plan.name}</h4>
-                          <p className="text-sm text-gray-500 capitalize">Role: {plan.role}</p>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedPlanId(plan._id);
-                          }}
-                        >
-                          Open
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Create New Plan */}
-            <div className="border-t pt-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium">Create New Plan</h3>
-                <Button
-                  onClick={() => setShowCreatePlanForm(!showCreatePlanForm)}
-                  className="flex items-center space-x-2"
-                >
-                  <FolderPlus className="h-4 w-4" />
-                  <span>New Plan</span>
-                </Button>
-              </div>
-
-              {showCreatePlanForm && (
-                <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
-                  <Input
-                    label="Plan Name"
-                    placeholder="Enter plan name"
-                    value={newPlanName}
-                    onChange={(e) => setNewPlanName(e.target.value)}
-                  />
-                  <Input
-                    label="Description (optional)"
-                    placeholder="Enter plan description"
-                    value={newPlanDescription}
-                    onChange={(e) => setNewPlanDescription(e.target.value)}
-                  />
-                  <div className="flex space-x-2">
-                    <Button
-                      onClick={handleCreatePlan}
-                      disabled={!newPlanName.trim()}
-                    >
-                      Create Plan
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setShowCreatePlanForm(false);
-                        setNewPlanName('');
-                        setNewPlanDescription('');
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+    return (
+      <div className="p-4 sm:p-6 text-center">
+        <div className="max-w-md mx-auto">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">No Plan Selected</h2>
+          <p className="text-gray-600 mb-4">
+            Please select a plan from the homepage to start managing tasks.
+          </p>
+          <Button
+            onClick={() => {
+              setSelectedPlanId(null);
+              navigate('/');
+            }}
+            variant="outline"
+            className="flex items-center space-x-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back to Plans</span>
+          </Button>
+        </div>
       </div>
     );
   }
@@ -241,13 +166,25 @@ export function Dashboard() {
           </div>
               <div className="flex items-center space-x-2 sm:space-x-3 flex-wrap">
                 <Button
-                  onClick={() => setSelectedPlanId(null)}
+                  onClick={() => {
+                    setSelectedPlanId(null);
+                    navigate('/');
+                  }}
                   variant="outline"
                   className="flex items-center space-x-1 sm:space-x-2"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span className="hidden sm:inline">Back to Plans</span>
                   <span className="sm:hidden">Back</span>
+                </Button>
+                <Button
+                  onClick={handleExportPlan}
+                  variant="outline"
+                  className="flex items-center space-x-1 sm:space-x-2"
+                >
+                  <Download className="h-4 w-4" />
+                  <span className="hidden sm:inline">Export</span>
+                  <span className="sm:hidden">Export</span>
                 </Button>
                 <Button
                   onClick={() => setShowTaskForm(true)}

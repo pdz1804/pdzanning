@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { useAppStore } from '@/store/appStore';
 import { Button } from '@/components/ui/Button';
@@ -7,8 +8,9 @@ import { Download, Upload, Settings, LogOut, FolderOpen, Menu } from 'lucide-rea
 
 export function Header() {
   const { user } = useAuthStore();
-  const { selectedPlanId, sidebarOpen, setSidebarOpen } = useAppStore();
+  const { selectedPlanId, sidebarOpen, setSidebarOpen, setSelectedPlanId } = useAppStore();
   const logoutMutation = useLogout();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     await logoutMutation.mutateAsync();
@@ -39,7 +41,15 @@ export function Header() {
             <Menu className="h-5 w-5" />
           </Button>
           
-          <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">pdzanning</h1>
+          <button
+            onClick={() => {
+              setSelectedPlanId(null);
+              navigate('/');
+            }}
+            className="text-lg sm:text-xl font-bold text-gray-900 truncate hover:text-primary-600 transition-colors"
+          >
+            pdzanning
+          </button>
           
           {selectedPlanId && (
             <div className="hidden sm:flex items-center space-x-2">

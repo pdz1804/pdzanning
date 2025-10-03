@@ -6,6 +6,7 @@ export interface IUser extends Document {
   password_hash: string;
   name: string;
   avatar?: string;
+  is_placeholder?: boolean;
   created_at: Date;
   updated_at: Date;
 }
@@ -21,7 +22,8 @@ const UserSchema = new Schema<IUser>({
   },
   password_hash: { type: String, required: true },
   name: { type: String, required: true, trim: true },
-  avatar: { type: String } // color/emoji
+  avatar: { type: String }, // color/emoji
+  is_placeholder: { type: Boolean, default: false }
 }, { 
   timestamps: { 
     createdAt: "created_at", 

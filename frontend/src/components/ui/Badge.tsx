@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn, getPriorityColor, getStatusColor } from '@/lib/utils';
+import { cn, getPriorityColor, getStatusColor, getPriorityLabel } from '@/lib/utils';
 
 interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: 'priority' | 'status' | 'default';
@@ -34,7 +34,7 @@ export function Badge({
       )}
       {...props}
     >
-      {children}
+      {children ?? (variant === 'priority' && value ? getPriorityLabel(value) : null)}
     </span>
   );
 }

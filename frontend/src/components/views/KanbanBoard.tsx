@@ -6,6 +6,7 @@ import {
   DragStartEvent,
   DragOverlay,
   rectIntersection,
+  closestCenter,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -171,7 +172,7 @@ function TaskCard({ task, onClick }: TaskCardProps) {
         )}
 
         {/* Progress */}
-        {task.progress_pct !== undefined && task.progress_pct > 0 && (
+        {task.progress_pct !== undefined && (
           <div className="space-y-1">
             <div className="flex justify-between text-xs text-gray-600">
               <span>Progress</span>
@@ -235,15 +236,21 @@ interface ColumnProps {
 
 function Column({ id, title, tasks, planId, onTaskClick }: ColumnProps) {
   const taskIds = tasks.map(task => task._id);
-  const { setNodeRef: setDroppableRef, isOver } = useDroppable({ id });
+  const { setNodeRef: setDroppableRef, isOver } = useDroppable({ 
+    id,
+    data: {
+      type: 'column',
+      status: id.replace('-column', '')
+    }
+  });
 
   return (
     <div
       ref={setDroppableRef}
       data-column-id={id}
       className={cn(
-        "rounded-lg p-4 min-h-[600px] transition-colors",
-        isOver ? "bg-blue-50" : "bg-gray-50"
+        "rounded-lg p-4 min-h-[600px] transition-colors border-2 border-dashed",
+        isOver ? "bg-blue-50 border-blue-300" : "bg-gray-50 border-gray-200"
       )}
     >
       <div className="flex items-center justify-between mb-4">
@@ -254,7 +261,7 @@ function Column({ id, title, tasks, planId, onTaskClick }: ColumnProps) {
       </div>
       
       <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
-        <div className="space-y-3">
+        <div className="space-y-3 min-h-[200px]">
           {tasks.map((task) => (
             <TaskCard 
               key={task._id} 
@@ -263,6 +270,11 @@ function Column({ id, title, tasks, planId, onTaskClick }: ColumnProps) {
               onDoubleClick={() => onTaskClick(task, true)}
             />
           ))}
+          {tasks.length === 0 && (
+            <div className="text-center py-8 text-gray-400 text-sm">
+              Drop tasks here
+            </div>
+          )}
         </div>
       </SortableContext>
     </div>
@@ -277,7 +289,11 @@ export function KanbanBoard({ tasks, planId }: KanbanBoardProps) {
   const [activeTask, setActiveTask] = useState<TaskWithDetails | null>(null);
   
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -302,22 +318,33 @@ export function KanbanBoard({ tasks, planId }: KanbanBoardProps) {
     // Clear the active task
     setActiveTask(null);
 
-    if (!over) return;
+    if (!over) {
+      console.log('No drop target detected');
+      return;
+    }
 
     const activeId = active.id as string;
     const overId = over.id as string;
 
     // Find the task being dragged
     const activeTask = tasks.find(task => task._id === activeId);
-    if (!activeTask) return;
+    if (!activeTask) {
+      console.log('Active task not found');
+      return;
+    }
 
-    // Determine if dropped onto a column droppable (only then call API to change status)
+    console.log('Drag ended:', { activeId, overId, activeTask: activeTask.title });
+
+    // Check if dropped onto a column droppable
     const isOverColumn = overId === 'todo-column' || overId === 'in_progress-column' || overId === 'done-column';
     let newStatus = activeTask.status;
+    
     if (isOverColumn) {
       if (overId === 'todo-column') newStatus = 'todo';
       if (overId === 'in_progress-column') newStatus = 'in_progress';
       if (overId === 'done-column') newStatus = 'done';
+      
+      console.log('Dropped on column:', overId, 'New status:', newStatus);
     }
 
     // If status changed AND user dropped over a column, update the task
@@ -376,7 +403,7 @@ export function KanbanBoard({ tasks, planId }: KanbanBoardProps) {
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={rectIntersection}
+      collisionDetection={closestCenter}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >

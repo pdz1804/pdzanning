@@ -105,30 +105,44 @@ export interface TaskFilters {
 
 // Export/Import types
 export interface ExportPlan {
-  schema_version: '1.0';
-  exported_at: string;
-  plan_id: string;
-  plan_title: string;
-  users_map: Record<string, {
-    display_name: string;
-    email: string;
-  }>;
+  plan: {
+    name: string;
+    description?: string;
+    members: Array<{
+      name: string;
+      email: string;
+      role: 'editor' | 'viewer';
+    }>;
+  };
   tasks: Array<{
-    _id: string;
     title: string;
     description?: string;
     status: 'todo' | 'in_progress' | 'done';
     priority?: 'low' | 'medium' | 'high' | 'urgent';
-    assignee_ids?: string[];
+    assignees: Array<{
+      name: string;
+      email: string;
+    }>;
     start_date?: string;
     due_date?: string;
     progress_pct?: number;
     parent_id?: string;
-    dependency_ids?: string[];
-    tags?: string[];
+    dependency_ids: string[];
+    tags: string[];
     estimate_hours?: number;
     order_index?: number;
+    goal?: string;
+    notes?: string;
+    deliverables?: string;
   }>;
+  export_metadata: {
+    exported_at: string;
+    exported_by: {
+      name: string;
+      email: string;
+    };
+    version: string;
+  };
 }
 
 // UI state types

@@ -8,6 +8,8 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { RegisterForm } from '@/components/auth/RegisterForm';
 import { Dashboard } from '@/components/Dashboard';
+import { Homepage } from '@/components/Homepage';
+import { PlanDetails } from '@/components/PlanDetails';
 import { useCurrentUser } from '@/hooks/useAuth';
 
 // Protected Route component
@@ -119,6 +121,14 @@ function App() {
           
           {/* Protected routes */}
           <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Homepage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
@@ -128,17 +138,19 @@ function App() {
               </ProtectedRoute>
             }
           />
-          
-          {/* Default redirect */}
           <Route
-            path="/"
-            element={<Navigate to="/dashboard" replace />}
+            path="/plans/:planId"
+            element={
+              <ProtectedRoute>
+                <PlanDetails />
+              </ProtectedRoute>
+            }
           />
           
           {/* Catch all route */}
           <Route
             path="*"
-            element={<Navigate to="/dashboard" replace />}
+            element={<Navigate to="/" replace />}
           />
         </Routes>
       </Router>

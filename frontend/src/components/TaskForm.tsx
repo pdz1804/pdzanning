@@ -34,6 +34,7 @@ export function TaskForm({ planId, onClose, onSuccess, initialData }: TaskFormPr
   });
   
   const [newTag, setNewTag] = useState('');
+  const [newAssignee, setNewAssignee] = useState('');
   const createTaskMutation = useCreateTask();
   
   // Get existing tasks to show top assignees and tags
@@ -66,6 +67,23 @@ export function TaskForm({ planId, onClose, onSuccess, initialData }: TaskFormPr
     setFormData(prev => ({
       ...prev,
       tags: prev.tags?.filter(tag => tag !== tagToRemove) || []
+    }));
+  };
+
+  const handleAddAssignee = () => {
+    if (newAssignee.trim() && !formData.assignee_ids?.includes(newAssignee.trim())) {
+      setFormData(prev => ({
+        ...prev,
+        assignee_ids: [...(prev.assignee_ids || []), newAssignee.trim()]
+      }));
+      setNewAssignee('');
+    }
+  };
+
+  const handleRemoveAssignee = (assigneeToRemove: string) => {
+    setFormData(prev => ({
+      ...prev,
+      assignee_ids: prev.assignee_ids?.filter(assignee => assignee !== assigneeToRemove) || []
     }));
   };
 
@@ -288,6 +306,48 @@ export function TaskForm({ planId, onClose, onSuccess, initialData }: TaskFormPr
               multiple={true}
               maxDisplay={3}
             />
+            
+            {/* Manual assignee input */}
+            <div className="flex space-x-2">
+              <div className="relative flex-1">
+                <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  value={newAssignee}
+                  onChange={(e) => setNewAssignee(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddAssignee())}
+                  placeholder="Add a new assignee"
+                  className="pl-10"
+                />
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleAddAssignee}
+                disabled={!newAssignee.trim()}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            {formData.assignee_ids && formData.assignee_ids.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {formData.assignee_ids.map((assignee) => (
+                  <span
+                    key={assignee}
+                    className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800"
+                  >
+                    {assignee}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveAssignee(assignee)}
+                      className="ml-1 hover:text-blue-600"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Tags with dropdown */}

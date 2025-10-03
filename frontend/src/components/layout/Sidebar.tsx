@@ -2,8 +2,7 @@ import React from 'react';
 import { useAppStore } from '@/store/appStore';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Badge } from '@/components/ui/Badge';
-import { Search, Filter, Calendar, Users, Tag } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 export function Sidebar() {
   const { 

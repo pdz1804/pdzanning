@@ -1,10 +1,9 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { useAppStore } from '@/store/appStore';
 import { Button } from '@/components/ui/Button';
 import { useLogout } from '@/hooks/useAuth';
-import { Download, Upload, Settings, LogOut, FolderOpen, Menu } from 'lucide-react';
+import { Download, Upload, LogOut, FolderOpen, Menu } from 'lucide-react';
 
 export function Header() {
   const { user } = useAuthStore();

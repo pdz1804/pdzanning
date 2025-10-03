@@ -1,9 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { TaskWithDetails } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { cn, formatDateShort, getDaysUntilDue } from '@/lib/utils';
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Calendar, Download, FileImage, FileText, FileSpreadsheet } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { ChevronLeft, ChevronRight, Calendar, FileImage, FileText, FileSpreadsheet } from 'lucide-react';
 
 interface GanttViewProps {
   tasks: TaskWithDetails[];
@@ -24,13 +24,13 @@ interface GanttTask {
   level: number; // For hierarchical display
 }
 
-export function GanttView({ tasks, planId }: GanttViewProps) {
+export function GanttView({ tasks }: GanttViewProps) {
   const [zoom, setZoom] = useState<GanttZoom>('week');
   const [currentDate, setCurrentDate] = useState(new Date());
 
   // Convert tasks to Gantt format
   const ganttTasks = useMemo(() => {
-    return tasks.map((task, index) => ({
+    return tasks.map((task) => ({
       id: task._id,
       title: task.title,
       startDate: task.start_date ? new Date(task.start_date) : null,
@@ -351,7 +351,7 @@ export function GanttView({ tasks, planId }: GanttViewProps) {
 
           {/* Task Rows */}
           <div className="divide-y divide-gray-200">
-            {ganttTasks.map((task, index) => {
+            {ganttTasks.map((task) => {
               const containerWidth = timeline.length * (zoom === 'day' ? 60 : zoom === 'week' ? 100 : 120);
               const dimensions = getTaskDimensions(task, containerWidth);
               

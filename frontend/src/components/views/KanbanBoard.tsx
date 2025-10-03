@@ -1,11 +1,8 @@
-import React from 'react';
 import {
   DndContext,
   DragEndEvent,
-  DragOverEvent,
   DragStartEvent,
   DragOverlay,
-  rectIntersection,
   closestCenter,
   KeyboardSensor,
   PointerSensor,
@@ -26,10 +23,9 @@ import { CSS } from '@dnd-kit/utilities';
 import { TaskWithDetails } from '@/types';
 import { useReorderTasks, useUpdateTask } from '@/hooks/useTasks';
 import { TaskDetailModal } from '@/components/TaskDetailModal';
-import { Card, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { cn, formatDateShort, getDaysUntilDue, isOverdue } from '@/lib/utils';
-import { Calendar, Users, MoreHorizontal, GripVertical, Target, FileText, CheckSquare } from 'lucide-react';
+import { cn, formatDateShort, isOverdue } from '@/lib/utils';
+import { Calendar, Users, GripVertical, Target, FileText, CheckSquare } from 'lucide-react';
 import { useState } from 'react';
 
 interface KanbanBoardProps {
@@ -234,7 +230,7 @@ interface ColumnProps {
   onTaskClick: (task: TaskWithDetails, startEdit?: boolean) => void;
 }
 
-function Column({ id, title, tasks, planId, onTaskClick }: ColumnProps) {
+function Column({ id, title, tasks, onTaskClick }: ColumnProps) {
   const taskIds = tasks.map(task => task._id);
   const { setNodeRef: setDroppableRef, isOver } = useDroppable({ 
     id,
@@ -267,7 +263,6 @@ function Column({ id, title, tasks, planId, onTaskClick }: ColumnProps) {
               key={task._id} 
               task={task} 
               onClick={() => onTaskClick(task)}
-              onDoubleClick={() => onTaskClick(task, true)}
             />
           ))}
           {tasks.length === 0 && (

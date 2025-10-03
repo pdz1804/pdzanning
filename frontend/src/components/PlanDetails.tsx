@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/appStore';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
 import { KanbanBoard } from '@/components/views/KanbanBoard';
 import { TableView } from '@/components/views/TableView';
 import { GanttView } from '@/components/views/GanttView';
 import { TaskForm } from '@/components/TaskForm';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { PlanSettingsModal } from '@/components/PlanSettingsModal';
-import { ArrowLeft, Plus, Users, Calendar, FileText, Settings, Edit3 } from 'lucide-react';
+import { ArrowLeft, Plus, Settings, Edit3 } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 import { useTasks } from '@/hooks/useTasks';
 import { Plan } from '@/types';
@@ -18,7 +16,7 @@ import { Plan } from '@/types';
 export function PlanDetails() {
   const { planId } = useParams<{ planId: string }>();
   const navigate = useNavigate();
-  const { activeView, filters, setActiveView } = useAppStore();
+  const { activeView, filters } = useAppStore();
   
   const [plan, setPlan] = useState<Plan | null>(null);
   const [isLoadingPlan, setIsLoadingPlan] = useState(false);
@@ -33,7 +31,13 @@ export function PlanDetails() {
       try {
         setIsLoadingPlan(true);
         const planData = await apiClient.getPlan(planId);
-        setPlan(planData);
+        // Add missing fields for Plan type compatibility
+        const fullPlan = {
+          ...planData,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        setPlan(fullPlan);
       } catch (error) {
         console.error('Failed to load plan:', error);
       } finally {

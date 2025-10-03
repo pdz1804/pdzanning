@@ -86,7 +86,7 @@ export function RegisterForm() {
             type="submit"
             className="w-full"
             isLoading={registerMutation.isPending}
-            disabled={!email || !password || !name || passwordMismatch}
+            disabled={!email || !password || !name || !!passwordMismatch}
           >
             Create Account
           </Button>

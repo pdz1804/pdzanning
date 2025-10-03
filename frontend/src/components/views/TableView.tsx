@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { TaskWithDetails } from '@/types';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { cn, formatDate, formatDateShort, getDaysUntilDue, isOverdue, getAvatarInitials, getAvatarColor } from '@/lib/utils';
-import { ChevronUp, ChevronDown, Calendar, Users, MoreHorizontal } from 'lucide-react';
+import { cn, formatDate, formatDateShort, isOverdue, getAvatarInitials, getAvatarColor } from '@/lib/utils';
+import { ChevronUp, ChevronDown, Calendar, MoreHorizontal } from 'lucide-react';
 
 interface TableViewProps {
   tasks: TaskWithDetails[];
@@ -13,7 +13,7 @@ interface TableViewProps {
 type SortField = 'title' | 'status' | 'priority' | 'due_date' | 'progress_pct' | 'created_at';
 type SortDirection = 'asc' | 'desc';
 
-export function TableView({ tasks, planId }: TableViewProps) {
+export function TableView({ tasks }: TableViewProps) {
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);

@@ -175,6 +175,9 @@ export interface TaskFormData {
   dependency_ids?: string[];
   tags?: string[];
   estimate_hours?: number;
+  goal?: string;
+  notes?: string;
+  deliverables?: string;
 }
 
 // Drag and drop types

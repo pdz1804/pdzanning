@@ -43,6 +43,7 @@ interface AppActions {
   
   // UI actions
   toggleSidebar: () => void;
+  setSidebarOpen: (open: boolean) => void;
   setLoading: (loading: boolean) => void;
 }
 
@@ -63,7 +64,7 @@ const defaultGanttState: GanttState = {
   showCriticalPath: false,
 };
 
-export const useAppStore = create<AppStore>((set, get) => ({
+export const useAppStore = create<AppStore>((set) => ({
   // State
   activeView: 'board',
   selectedPlanId: null,
@@ -121,6 +122,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
   toggleSidebar: () => set((state) => ({
     sidebarOpen: !state.sidebarOpen
   })),
+  
+  setSidebarOpen: (open) => set({ sidebarOpen: open }),
   
   setLoading: (loading) => set({ isLoading: loading }),
 }));

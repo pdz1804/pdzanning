@@ -38,7 +38,7 @@ export function TaskForm({ planId, onClose, onSuccess, initialData }: TaskFormPr
   const createTaskMutation = useCreateTask();
   
   // Get existing tasks to show top assignees and tags
-  const { data: tasksData } = useTasks(planId, {}, { enabled: false }); // Don't fetch if not needed
+  const { data: tasksData } = useTasks(planId, {}); // Don't fetch if not needed
   const topAssignees = useTopAssignees(tasksData?.data || []);
   const topTags = useTopTags(tasksData?.data || []);
 

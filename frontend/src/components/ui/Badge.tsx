@@ -2,7 +2,7 @@ import React from 'react';
 import { cn, getPriorityColor, getStatusColor, getPriorityLabel } from '@/lib/utils';
 
 interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: 'priority' | 'status' | 'default';
+  variant?: 'priority' | 'status' | 'default' | 'outline';
   value?: string;
   children?: React.ReactNode;
 }
@@ -20,6 +20,8 @@ export function Badge({
         return getPriorityColor(value);
       case 'status':
         return getStatusColor(value || '');
+      case 'outline':
+        return 'border-gray-300 text-gray-700 bg-transparent';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }

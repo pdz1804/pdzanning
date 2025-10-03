@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
-import { TaskFilters, TaskFormData, TaskWithDetails } from '@/types';
+import { TaskFilters, TaskFormData } from '@/types';
 
 // Query keys
 export const taskKeys = {
@@ -26,7 +26,7 @@ export function useCreateTask() {
   return useMutation({
     mutationFn: ({ planId, taskData }: { planId: string; taskData: TaskFormData }) =>
       apiClient.createTask(planId, taskData),
-    onSuccess: (newTask, { planId }) => {
+    onSuccess: () => {
       // Invalidate and refetch tasks for this plan
       queryClient.invalidateQueries({ queryKey: taskKeys.lists() });
     },
@@ -78,7 +78,7 @@ export function useDeleteTask() {
   return useMutation({
     mutationFn: ({ taskId, planId }: { taskId: string; planId: string }) =>
       apiClient.deleteTask(taskId, planId),
-    onSuccess: (_, { planId }) => {
+    onSuccess: () => {
       // Invalidate and refetch tasks for this plan
       queryClient.invalidateQueries({ queryKey: taskKeys.lists() });
     },
@@ -92,7 +92,7 @@ export function useReorderTasks() {
   return useMutation({
     mutationFn: ({ planId, taskIds }: { planId: string; taskIds: string[] }) =>
       apiClient.reorderTasks(planId, taskIds),
-    onSuccess: (_, { planId }) => {
+    onSuccess: () => {
       // Invalidate and refetch tasks for this plan
       queryClient.invalidateQueries({ queryKey: taskKeys.lists() });
     },
@@ -106,7 +106,7 @@ export function useBulkCreateTasks() {
   return useMutation({
     mutationFn: ({ planId, tasks }: { planId: string; tasks: TaskFormData[] }) =>
       apiClient.bulkCreateTasks(planId, tasks),
-    onSuccess: (_, { planId }) => {
+    onSuccess: () => {
       // Invalidate and refetch tasks for this plan
       queryClient.invalidateQueries({ queryKey: taskKeys.lists() });
     },

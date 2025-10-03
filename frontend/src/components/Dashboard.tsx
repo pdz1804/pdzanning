@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '@/store/appStore';
 import { useTasks } from '@/hooks/useTasks';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { KanbanBoard } from '@/components/views/KanbanBoard';
 import { TableView } from '@/components/views/TableView';
 import { GanttView } from '@/components/views/GanttView';
@@ -42,9 +40,7 @@ export function Dashboard() {
     loadUserPlans();
   }, []); // Only run once on mount
 
-  const { data: tasksData, isLoading, error } = useTasks(selectedPlanId || '', filters, {
-    enabled: !!selectedPlanId // Only fetch tasks when a plan is selected
-  });
+  const { data: tasksData, isLoading, error } = useTasks(selectedPlanId || '', filters);
 
   const handleExportPlan = async () => {
     if (!selectedPlanId) return;

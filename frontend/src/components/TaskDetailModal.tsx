@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { TaskWithDetails } from '@/types';
-import { useUpdateTask, useTasks } from '@/hooks/useTasks';
-import { useTopAssignees, useTopTags } from '@/hooks/useTopItems';
+import { useUpdateTask } from '@/hooks/useTasks';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
-import { Dropdown } from '@/components/ui/Dropdown';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { cn, formatDate, getAvatarInitials, getAvatarColor } from '@/lib/utils';
-import { X, Save, Calendar, Users, Tag, Clock, FileText } from 'lucide-react';
+import { X, Save, Calendar, Tag, Clock, FileText } from 'lucide-react';
 
 interface TaskDetailModalProps {
   task: TaskWithDetails;
@@ -39,9 +37,9 @@ export function TaskDetailModal({ task, planId, startInEdit, onClose, onSave }: 
   const updateTaskMutation = useUpdateTask();
   
   // Get existing tasks to show top assignees and tags
-  const { data: tasksData } = useTasks(planId, {}, { enabled: false }); // Don't fetch if not needed
-  const topAssignees = useTopAssignees(tasksData?.data || []);
-  const topTags = useTopTags(tasksData?.data || []);
+  // const { data: tasksData } = useTasks(planId, {}); // Don't fetch if not needed
+  // const topAssignees = useTopAssignees(tasksData?.data || []);
+  // const topTags = useTopTags(tasksData?.data || []);
 
   const handleSave = async () => {
     try {

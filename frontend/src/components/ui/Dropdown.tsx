@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronDown } from 'lucide-react';
 
@@ -58,9 +58,9 @@ export function Dropdown({
     }
   };
 
-  const removeItem = (itemId: string) => {
-    onSelectionChange(selectedItems.filter(id => id !== itemId));
-  };
+  // const removeItem = (_itemId: string) => {
+  //   onSelectionChange(selectedItems.filter(id => id !== _itemId));
+  // };
 
   return (
     <div className={cn("relative", className)} ref={dropdownRef}>

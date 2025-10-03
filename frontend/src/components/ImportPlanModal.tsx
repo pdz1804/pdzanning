@@ -54,7 +54,7 @@ export function ImportPlanModal({ isOpen, onClose, onSuccess }: ImportPlanModalP
       setEditablePlan({
         name: data.plan.name,
         description: data.plan.description || '',
-        members: data.plan.members.map(member => ({ ...member }))
+        members: data.plan.members.map((member: any) => ({ ...member }))
       });
     } catch (err) {
       setError('Invalid file format. Please select a valid plan export file.');
@@ -93,7 +93,15 @@ export function ImportPlanModal({ isOpen, onClose, onSuccess }: ImportPlanModalP
           goal: task.goal || undefined,
           notes: task.notes || undefined,
           deliverables: task.deliverables || undefined
-        }))
+        })),
+        export_metadata: {
+          exported_at: new Date().toISOString(),
+          exported_by: {
+            name: 'Import User',
+            email: 'import@example.com'
+          },
+          version: '1.0'
+        }
       };
       
       console.log('Sending import data:', modifiedPlanData);

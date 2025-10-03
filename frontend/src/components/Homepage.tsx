@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '@/store/appStore';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { ImportPlanModal } from '@/components/ImportPlanModal';
-import { FolderPlus, FolderOpen, LogOut, User, Upload, Download } from 'lucide-react';
+import { FolderPlus, FolderOpen, LogOut, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { apiClient } from '@/lib/api';
 import { useLogout } from '@/hooks/useAuth';

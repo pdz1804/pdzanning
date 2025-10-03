@@ -36,8 +36,13 @@ export const taskSchema = taskBaseSchema.refine((data) => {
 // For PATCH updates, allow partial fields; omit plan_id to avoid accidental plan moves
 export const taskUpdateSchema = taskBaseSchema.partial().omit({ plan_id: true });
 
+// Extended task schema for bulk operations that includes _id
+const bulkTaskItemSchema = taskBaseSchema.extend({
+  _id: z.string().optional(), // For bulk operations where tasks might have IDs
+});
+
 export const bulkTaskSchema = z.object({
-  tasks: z.array(taskSchema),
+  tasks: z.array(bulkTaskItemSchema),
   plan_id: z.string().min(1, "Plan ID is required"),
 });
 
@@ -48,6 +53,7 @@ export const reorderTasksSchema = z.object({
 
 export type TaskInput = z.infer<typeof taskSchema>;
 export type TaskUpdateInput = z.infer<typeof taskUpdateSchema>;
+export type BulkTaskItemInput = z.infer<typeof bulkTaskItemSchema>;
 export type BulkTaskInput = z.infer<typeof bulkTaskSchema>;
 export type ReorderTasksInput = z.infer<typeof reorderTasksSchema>;
 

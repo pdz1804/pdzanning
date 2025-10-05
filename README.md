@@ -75,7 +75,7 @@ A lightweight planning app that unifies **Kanban**, **Table**, and **Gantt** vie
    
    Update `backend/.env` with your configuration:
    ```env
-   MONGODB_URI=mongodb+srv://... (get on Atlas MongoDB)
+   MONGODB_URI=mongodb+srv://... 
    JWT_ACCESS_SECRET=your-super-secret-access-key
    JWT_REFRESH_SECRET=your-super-secret-refresh-key
    PORT=3001
